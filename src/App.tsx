@@ -1,165 +1,199 @@
 import { useState, useEffect } from 'react';
 
 // ==========================================
-// 1. CSS STİLLERİ (Yıldızlar, Giriş ve Kart Dahil)
+// 1. CSS: SİNEMATİK EFEKTLER & ATMOSFER
 // ==========================================
 const styles = `
   /* FONT AİLESİ */
-  @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Cinzel:wght@400;700&family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;1,400&display=swap');
   
-  .arabic-font { font-family: 'Scheherazade New', serif; line-height: 1.2; }
-  .title-font { fontFamily: 'Cinzel', serif; }
-  .body-font { fontFamily: 'Inter', sans-serif; }
-  .dua-font { fontFamily: 'Playfair Display', serif; font-style: italic; }
+  /* --- GENEL AYARLAR --- */
+  body, html { margin: 0; padding: 0; background-color: #000; overflow: hidden; height: 100%; width: 100%; font-family: 'Inter', sans-serif; }
 
-  /* --- SAYFA YAPISI --- */
-  body, html { margin: 0; padding: 0; background-color: #020617; overflow: hidden; height: 100%; width: 100%; }
-
-  /* --- ARKA PLAN VE YILDIZLAR --- */
-  .heavenly-background {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: radial-gradient(circle at center bottom, #1e293b 0%, #0f172a 40%, #020617 100%);
-    z-index: 0; overflow: hidden;
+  /* --- KOZMİK ARKA PLAN --- */
+  .cosmos-container {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+    overflow: hidden; z-index: 0;
   }
+  
+  /* Durgun Yıldızlar */
+  .stars-layer {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: transparent;
+    animation: zoom-slow 100s linear infinite;
+  }
+  @keyframes zoom-slow { 0% { transform: scale(1); } 100% { transform: scale(1.5); } }
 
-  .star {
-    position: absolute;
-    background: white;
-    border-radius: 50%;
-    animation: twinkle var(--duration) ease-in-out infinite;
+  .star-static {
+    position: absolute; background: white; border-radius: 50%;
+    box-shadow: 0 0 2px rgba(255,255,255,0.8);
+    animation: twinkle var(--dur) ease-in-out infinite alternate;
+  }
+  @keyframes twinkle { 0% { opacity: 0.2; } 100% { opacity: 1; box-shadow: 0 0 4px white; } }
+
+  /* Kayan Yıldızlar (Shooting Stars) */
+  .shooting-star {
+    position: absolute; top: 50%; left: 50%; height: 2px;
+    background: linear-gradient(-45deg, rgba(255,255,255,1), rgba(0,0,255,0));
+    filter: drop-shadow(0 0 6px rgba(255,215,0,0.8));
+    border-radius: 999px; opacity: 0;
+    transform: rotate(-45deg) translateX(0);
+    animation: shoot 6s ease-in-out infinite;
     animation-delay: var(--delay);
+    width: var(--len);
   }
-  @keyframes twinkle {
-    0% { opacity: 0; transform: scale(0.5); }
-    50% { opacity: var(--opacity); transform: scale(1); }
-    100% { opacity: 0; transform: scale(0.5); }
+  .shooting-star::before {
+    content: ''; position: absolute; top: 50%; transform: translateY(-50%);
+    right: 0; height: 4px; width: 4px; background: #fff; border-radius: 50%;
+    box-shadow: 0 0 10px #fff, 0 0 20px #fbbf24;
   }
-
-  .light-beams {
-    position: absolute; top: 50%; left: 50%; width: 200vw; height: 200vw;
-    transform: translate(-50%, -50%);
-    background: repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.03) 0deg, rgba(255, 255, 255, 0) 15deg, rgba(255, 255, 255, 0.03) 30deg);
-    animation: rotate-beams 120s linear infinite; z-index: 1; pointer-events: none;
-    mask-image: radial-gradient(circle, black 0%, transparent 70%);
-  }
-  @keyframes rotate-beams { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
-
-  .nebula {
-    position: absolute; width: 100%; height: 100%;
-    background: radial-gradient(circle at 50% -20%, rgba(251, 191, 36, 0.08) 0%, transparent 60%), radial-gradient(circle at 20% 80%, rgba(14, 165, 233, 0.05) 0%, transparent 50%);
-    filter: blur(80px); z-index: 2;
+  @keyframes shoot {
+    0% { opacity: 0; transform: rotate(-45deg) translateX(0) translateY(0); }
+    10% { opacity: 1; }
+    20% { opacity: 0; transform: rotate(-45deg) translateX(-1000px) translateY(1000px); }
+    100% { opacity: 0; }
   }
 
   /* --- GİRİŞ EKRANI (INTRO) --- */
-  .intro-container {
-    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    z-index: 30; text-align: center; color: white;
-    transition: opacity 1s ease, transform 1s ease;
+  .intro-overlay {
+    position: absolute; inset: 0; z-index: 50;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.2);
+    transition: all 1.2s cubic-bezier(0.7, 0, 0.3, 1);
   }
-  .intro-title {
-    font-size: 4rem; font-family: 'Cinzel', serif; letter-spacing: 0.2em;
-    background: linear-gradient(to right, #fbbf24, #fffbeb, #fbbf24);
-    -webkit-background-clip: text; color: transparent;
-    text-shadow: 0 0 30px rgba(251, 191, 36, 0.3); margin-bottom: 2rem;
-  }
-  .start-btn {
-    padding: 1rem 3rem; font-size: 1.2rem; letter-spacing: 0.15em; text-transform: uppercase;
-    background: transparent; border: 1px solid rgba(251, 191, 36, 0.4); color: #fbbf24;
-    cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden;
-    font-family: 'Cinzel', serif;
-  }
-  .start-btn:hover { background: rgba(251, 191, 36, 0.1); box-shadow: 0 0 20px rgba(251, 191, 36, 0.2); transform: translateY(-2px); }
   
-  .hidden-intro { opacity: 0; pointer-events: none; transform: scale(1.1); }
-
-  /* --- KART VE İÇERİK --- */
-  .content-container { 
-    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; 
-    z-index: 20; perspective: 1000px; 
-    opacity: 0; pointer-events: none; transition: opacity 1s ease 0.5s;
-  }
-  .content-visible { opacity: 1; pointer-events: auto; }
-
-  .crystal-card {
-    width: 90%; max-width: 550px; max-height: 90vh;
-    background: rgba(15, 23, 42, 0.75); 
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255, 0.05) inset;
-    backdrop-filter: blur(40px); border-radius: 30px; padding: 0;
-    text-align: center; position: relative; overflow: hidden;
-    display: flex; flex-direction: column;
+  /* Portal Efekti (Başla'ya basınca çalışır) */
+  .intro-overlay.zoom-out {
+    opacity: 0; transform: scale(2); filter: blur(20px); pointer-events: none;
   }
 
-  .card-scroll-area {
-    padding: 2.5rem 2rem;
-    overflow-y: auto;
+  .intro-title-wrapper { position: relative; margin-bottom: 3rem; text-align: center; }
+  
+  .intro-title {
+    font-family: 'Cinzel', serif; font-size: 5rem; font-weight: 800; letter-spacing: 0.15em;
+    background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+    -webkit-background-clip: text; color: transparent;
+    text-shadow: 0 0 50px rgba(251, 191, 36, 0.3);
+    animation: shine 5s linear infinite; background-size: 200%;
+  }
+  @media (max-width: 768px) { .intro-title { font-size: 3rem; } }
+
+  .intro-subtitle {
+    font-family: 'Scheherazade New', serif; font-size: 2.5rem; color: #fbbf24;
+    margin-top: -10px; opacity: 0.8; letter-spacing: 0.05em;
+    animation: float 4s ease-in-out infinite;
+  }
+
+  @keyframes shine { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+  .glow-btn {
+    position: relative; padding: 1.2rem 4rem; font-size: 1.2rem;
+    font-family: 'Cinzel', serif; letter-spacing: 0.2em; text-transform: uppercase; color: #fff;
+    background: transparent; border: 1px solid rgba(255, 215, 0, 0.3);
+    cursor: pointer; overflow: hidden; transition: 0.5s;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.1);
+  }
+  .glow-btn::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.4), transparent);
+    transition: 0.5s;
+  }
+  .glow-btn:hover {
+    background: rgba(251, 191, 36, 0.1);
+    box-shadow: 0 0 30px rgba(251, 191, 36, 0.4), 0 0 60px rgba(251, 191, 36, 0.2);
+    border-color: #fbbf24; transform: scale(1.05);
+  }
+  .glow-btn:hover::before { left: 100%; transition: 0.5s; }
+
+  /* --- KART ALANI --- */
+  .main-content {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    z-index: 40; perspective: 1500px;
+    opacity: 0; transform: translateY(50px) scale(0.9); pointer-events: none;
+    transition: opacity 1.5s ease 0.5s, transform 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.5s;
+  }
+  .main-content.visible {
+    opacity: 1; transform: translateY(0) scale(1); pointer-events: auto;
+  }
+
+  .glass-card {
+    width: 90%; max-width: 500px; max-height: 85vh;
+    background: rgba(16, 20, 35, 0.65);
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    border-top: 1px solid rgba(255, 215, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 215, 0, 0.05);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+    border-radius: 24px; padding: 0;
+    display: flex; flex-direction: column; overflow: hidden;
+    animation: card-float 8s ease-in-out infinite;
+  }
+  @keyframes card-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+  .card-inner {
+    padding: 2.5rem 2rem; overflow-y: auto; text-align: center;
     scrollbar-width: thin; scrollbar-color: rgba(251, 191, 36, 0.3) transparent;
   }
-  .card-scroll-area::-webkit-scrollbar { width: 4px; }
-  .card-scroll-area::-webkit-scrollbar-thumb { background-color: rgba(251, 191, 36, 0.3); border-radius: 20px; }
-
-  /* 1. ARAPÇA */
-  .gold-mist-text {
-    background: linear-gradient(to bottom, #fffbeb 10%, #fbbf24 50%, #d97706 90%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-    filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.4));
-    font-size: 5rem; line-height: 1.2; margin-bottom: 0.5rem;
-  }
   
-  /* 2. OKUNUŞ */
-  .transliteration {
-    font-family: 'Cinzel', serif; color: #bae6fd; font-size: 1.5rem;
-    letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1.5rem; opacity: 0.9;
+  /* İçerik Yazıları */
+  .arabic-title {
+    font-family: 'Scheherazade New', serif; font-size: 5.5rem; line-height: 1.1;
+    background: linear-gradient(180deg, #fff 0%, #fbbf24 100%);
+    -webkit-background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.5));
+    margin-bottom: 0.5rem; animation: pulse-gold 3s infinite alternate;
+  }
+  @keyframes pulse-gold { 0% { filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.3)); } 100% { filter: drop-shadow(0 0 25px rgba(251, 191, 36, 0.7)); } }
+
+  .reading-text {
+    font-family: 'Cinzel', serif; font-size: 1.4rem; color: #bae6fd;
+    letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1.5rem;
   }
 
-  .divider { width: 60px; height: 1px; background: rgba(251, 191, 36, 0.5); margin: 0 auto 1.5rem auto; }
-
-  /* 3. ANLAM */
-  .meaning-box {
-    margin-bottom: 2rem; color: #f1f5f9; font-family: 'Inter', sans-serif;
-    font-weight: 300; font-size: 1rem; line-height: 1.6;
+  .golden-divider {
+    height: 1px; width: 60px; background: linear-gradient(90deg, transparent, #fbbf24, transparent);
+    margin: 0 auto 1.5rem auto;
   }
 
-  /* 4. SORU (TEFEKKÜR) */
-  .question-wrapper {
-    background: rgba(14, 165, 233, 0.1); border-left: 3px solid #38bdf8;
-    padding: 1rem; margin-bottom: 1.5rem; text-align: left; border-radius: 0 10px 10px 0;
-  }
-  .question-label {
-    display: block; font-size: 0.75rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; font-weight: 700;
-  }
-  .question-text {
-    font-family: 'Inter', sans-serif; color: #e0f2fe; font-style: italic; font-size: 0.95rem;
+  .meaning-text {
+    font-family: 'Inter', sans-serif; font-weight: 300; font-size: 1.05rem; color: #e2e8f0; line-height: 1.6; margin-bottom: 2rem;
   }
 
-  /* 5. DUA */
-  .dua-wrapper {
-    position: relative; padding: 1.5rem;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(251, 191, 36, 0.05) 100%);
-    border-radius: 16px; border: 1px solid rgba(251, 191, 36, 0.15);
+  .box-tefekkur {
+    background: rgba(14, 165, 233, 0.08); border-left: 2px solid #38bdf8;
+    padding: 1.2rem; margin-bottom: 1.5rem; text-align: left; border-radius: 0 12px 12px 0;
   }
-  .dua-label {
+  .box-tefekkur h4 { margin: 0 0 0.5rem 0; font-size: 0.75rem; color: #38bdf8; letter-spacing: 0.15em; text-transform: uppercase; }
+  .box-tefekkur p { margin: 0; font-style: italic; color: #bae6fd; font-size: 0.95rem; }
+
+  .box-dua {
+    position: relative; padding: 1.5rem; border-radius: 16px;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.05), transparent);
+    border: 1px solid rgba(251, 191, 36, 0.1); margin-top: 1rem;
+  }
+  .dua-badge {
     position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-    background: #0f172a; padding: 0 10px; color: #fbbf24;
-    font-size: 0.8rem; border-radius: 99px; border: 1px solid rgba(251, 191, 36, 0.3);
-    text-transform: uppercase; letter-spacing: 0.1em;
+    background: #0f172a; border: 1px solid #fbbf24; color: #fbbf24;
+    padding: 2px 12px; border-radius: 20px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
   }
-  .dua-text {
-    font-family: 'Playfair Display', serif; font-style: italic;
-    font-size: 1.1rem; color: #fcd34d; line-height: 1.6;
+  .box-dua p {
+    font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.15rem; color: #fcd34d; margin: 0;
   }
 
-  .nav-btn {
-    width: 100%; padding: 1.2rem;
-    background: rgba(255, 255, 255, 0.05); border-top: 1px solid rgba(255, 255, 255, 0.1);
-    color: #94a3b8; text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.8rem; font-weight: 600;
-    cursor: pointer; transition: all 0.3s;
+  .next-btn {
+    width: 100%; padding: 1.5rem; cursor: pointer;
+    background: rgba(255, 255, 255, 0.03); border: none; border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8; font-family: 'Cinzel', serif; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
+    transition: all 0.3s ease;
   }
-  .nav-btn:hover { background: rgba(251, 191, 36, 0.1); color: #fbbf24; }
+  .next-btn:hover { background: rgba(251, 191, 36, 0.15); color: #fbbf24; letter-spacing: 0.35em; }
 
-  .fade-wrapper { transition: opacity 0.5s ease, transform 0.5s ease; }
-  .fade-out { opacity: 0; transform: scale(0.98); }
-  .fade-in { opacity: 1; transform: scale(1); }
+  /* İçerik Geçiş Animasyonu */
+  .fade-content { transition: opacity 0.6s ease, transform 0.6s ease; }
+  .fade-out { opacity: 0; transform: translateY(10px) scale(0.95); filter: blur(5px); }
+  .fade-in { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 `;
 // ==========================================
 // 2. TAM VERİ SETİ (SIRALI BİRLEŞTİRİLMİŞ)
@@ -275,31 +309,32 @@ function App() {
   const [fading, setFading] = useState(false);
   const [stars, setStars] = useState([]);
 
-  // Yıldızları oluştur
+  // Yıldızları ve Meteorları Oluştur
   useEffect(() => {
-    const starArray = Array.from({ length: 50 }).map((_, i) => ({
-      id: i,
+    // Sabit Yıldızlar
+    const starArray = Array.from({ length: 100 }).map((_, i) => ({
+      id: `star-${i}`,
       left: Math.random() * 100 + '%',
       top: Math.random() * 100 + '%',
-      size: Math.random() * 2 + 1 + 'px',
-      delay: Math.random() * 5 + 's',
-      duration: Math.random() * 3 + 2 + 's',
-      opacity: Math.random() * 0.7 + 0.3
+      size: Math.random() * 3 + 'px',
+      dur: Math.random() * 3 + 2 + 's'
     }));
     setStars(starArray);
   }, []);
 
-  // Rastgele bir index seç (Mevcut olan hariç)
+  // Rastgele İsim Seçme Fonksiyonu
   const getRandomIndex = () => {
+    // Eğer sadece 1 eleman varsa döngüye girmesin
+    if (esmaData.length <= 1) return 0;
+    
     let newIndex;
     do {
       newIndex = Math.floor(Math.random() * esmaData.length);
-    } while (newIndex === currentIndex && esmaData.length > 1);
+    } while (newIndex === currentIndex);
     return newIndex;
   };
 
   const handleStart = () => {
-    // Başlarken de rastgele bir isimle başla
     setCurrentIndex(getRandomIndex());
     setStarted(true);
   };
@@ -307,10 +342,9 @@ function App() {
   const handleNext = () => {
     setFading(true);
     setTimeout(() => {
-      // Rastgele (Karışık) seçim
       setCurrentIndex(getRandomIndex());
       setFading(false);
-    }, 500);
+    }, 600); // Animasyon süresiyle uyumlu bekleme
   };
 
   const currentEsma = esmaData[currentIndex];
@@ -319,81 +353,80 @@ function App() {
     <>
       <style>{styles}</style>
 
-      {/* ARKA PLAN */}
-      <div className="heavenly-background">
-        <div className="light-beams"></div>
-        <div className="nebula"></div>
-        {stars.map((star) => (
-          <div
-            key={star.id}
-            className="star"
-            style={{
-              left: star.left,
-              top: star.top,
-              width: star.size,
-              height: star.size,
-              '--delay': star.delay,
-              '--duration': star.duration,
-              '--opacity': star.opacity
-            }}
-          />
-        ))}
+      {/* KOZMİK ARKA PLAN */}
+      <div className="cosmos-container">
+        {/* Sabit Yıldız Katmanı */}
+        <div className="stars-layer">
+          {stars.map((star) => (
+            <div
+              key={star.id}
+              className="star-static"
+              style={{
+                left: star.left,
+                top: star.top,
+                width: star.size,
+                height: star.size,
+                '--dur': star.dur
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Kayan Yıldızlar (Meteorlar) - Manuel olarak konumlandırılmış, zamanlanmış */}
+        <div className="shooting-star" style={{ top: '20%', left: '80%', '--len': '150px', '--delay': '2s' }}></div>
+        <div className="shooting-star" style={{ top: '10%', left: '50%', '--len': '200px', '--delay': '7s' }}></div>
+        <div className="shooting-star" style={{ top: '60%', left: '90%', '--len': '120px', '--delay': '12s' }}></div>
+        <div className="shooting-star" style={{ top: '40%', left: '20%', '--len': '180px', '--delay': '18s' }}></div>
       </div>
 
-      {/* GİRİŞ EKRANI (Landing) */}
-      <div className={`intro-container ${started ? 'hidden-intro' : ''}`}>
-        <h1 className="intro-title">ESMA-ÜL HÜSNA</h1>
-        <button onClick={handleStart} className="start-btn">
+      {/* GİRİŞ EKRANI (INTRO) */}
+      <div className={`intro-overlay ${started ? 'zoom-out' : ''}`}>
+        <div className="intro-title-wrapper">
+          <h1 className="intro-title">ESMA-ÜL HÜSNA</h1>
+          <div className="intro-subtitle">99 Güzel İsim</div>
+        </div>
+        <button onClick={handleStart} className="glow-btn">
           BAŞLA
         </button>
       </div>
 
-      {/* İÇERİK KARTI */}
-      <div className={`content-container ${started ? 'content-visible' : ''}`}>
-        <div className="crystal-card">
+      {/* ANA KART EKRANI */}
+      <div className={`main-content ${started ? 'visible' : ''}`}>
+        <div className="glass-card">
           
-          <div className="card-scroll-area">
-            <div className={`fade-wrapper ${fading ? 'fade-out' : 'fade-in'}`}>
+          <div className="card-inner">
+            <div className={`fade-content ${fading ? 'fade-out' : 'fade-in'}`}>
               
-              {/* 1. ARAPÇA İSİM (EN ÜSTTE) */}
-              <div className="mb-2">
-                <h2 className="arabic-font gold-mist-text drop-shadow-2xl">{currentEsma.arabic}</h2>
-              </div>
+              {/* 1. Arapça */}
+              <div className="arabic-title">{currentEsma.arabic}</div>
+              
+              {/* 2. Okunuş */}
+              <div className="reading-text">{currentEsma.transliteration}</div>
+              
+              <div className="golden-divider"></div>
 
-              {/* 2. OKUNUŞ (ALTTA) */}
-              <div className="mb-4">
-                <h3 className="transliteration">{currentEsma.transliteration}</h3>
-              </div>
-
-              <div className="divider"></div>
-
-              {/* 3. ANLAM (ALTTA) */}
-              <div className="meaning-box">
+              {/* 3. Anlam */}
+              <div className="meaning-text">
                 {currentEsma.meaning}
               </div>
 
-              {/* 4. TEFEKKÜR SORUSU (ALTTA) */}
-              <div className="question-wrapper">
-                <span className="question-label">Tefekkür</span>
-                <p className="question-text">
-                  "{currentEsma.question}"
-                </p>
+              {/* 4. Tefekkür */}
+              <div className="box-tefekkur">
+                <h4>Tefekkür</h4>
+                <p>"{currentEsma.question}"</p>
               </div>
 
-              {/* 5. DUA (EN ALTTA) */}
-              <div className="dua-wrapper">
-                <div className="dua-label">Dua</div>
-                <p className="dua-text">
-                  "{currentEsma.dua}"
-                </p>
+              {/* 5. Dua */}
+              <div className="box-dua">
+                <div className="dua-badge">Dua</div>
+                <p>"{currentEsma.dua}"</p>
               </div>
 
             </div>
           </div>
 
-          {/* BUTON (Kartın altında sabit) */}
-          <button onClick={handleNext} className="nav-btn title-font">
-            Sıradaki İsmi Getir
+          <button onClick={handleNext} className="next-btn">
+            SIRADAKİ İSİM
           </button>
 
         </div>
