@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 // ==========================================
-// 1. CSS STİLLERİ (GÜNCELLENMİŞ GİRİŞ EKRANI)
+// 1. CSS STİLLERİ (AURORA & CAM EFEKTİ)
 // ==========================================
 const styles = `
   /* FONT AİLESİ */
@@ -11,119 +11,119 @@ const styles = `
   .title-font { fontFamily: 'Cinzel', serif; }
   .body-font { fontFamily: 'Inter', sans-serif; }
 
-  /* --- SAYFA YAPISI --- */
+  /* --- TEMEL YAPISI --- */
   body, html { margin: 0; padding: 0; background-color: #0f172a; overflow: hidden; height: 100%; width: 100%; }
 
-  /* --- ARKA PLAN (DERİN GÖKYÜZÜ) --- */
+  /* --- ARKA PLAN (AURORA EFEKTİ) --- */
   .heavenly-background {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    /* Derin maviden, turkuaza ve altın sarısı ufuk çizgisine geçiş */
-    background: linear-gradient(160deg, #0c4a6e 0%, #0284c7 40%, #38bdf8 70%, #fef3c7 100%);
-    z-index: 0;
-    overflow: hidden;
-    perspective: 1000px;
+    background: #0f172a; /* Çok koyu lacivert taban */
+    z-index: 0; overflow: hidden; perspective: 1000px;
   }
 
-  /* Işık Bulutları (Nebula) */
-  .nebula {
-    position: absolute; width: 100%; height: 100%;
-    background: 
-      radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.3) 0%, transparent 60%), /* Biraz daha şeffaf */
-      radial-gradient(circle at 10% 80%, rgba(253, 224, 71, 0.2) 0%, transparent 50%);
-    filter: blur(70px); /* Daha fazla bulanıklık */
-    animation: light-move 25s infinite alternate ease-in-out; /* Daha yavaş hareket */
+  /* Hareketli Işık Blokları (Aurora) */
+  .aurora-blob {
+    position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4;
+    animation: aurora-float 20s infinite alternate ease-in-out;
   }
-  @keyframes light-move { from { transform: scale(1); opacity: 0.6; } to { transform: scale(1.1); opacity: 0.8; } }
+  .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #0c4a6e; animation-delay: 0s; }
+  .blob-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: #0369a1; animation-delay: -5s; }
+  .blob-3 { top: 40%; left: 40%; width: 40vw; height: 40vw; background: #4338ca; animation-delay: -10s; opacity: 0.3; }
+  
+  @keyframes aurora-float {
+    0% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
 
-  /* --- PARÇACIK SİSTEMİ --- */
-  .star-field { position: absolute; width: 100%; height: 100%; transform-style: preserve-3d; z-index: 1; }
-
+  /* --- YILDIZLAR --- */
+  .star-field { position: absolute; width: 100%; height: 100%; z-index: 1; }
   .star-small {
-    position: absolute; background: #fff;
-    border-radius: 50%; width: 2px; height: 2px; /* Biraz daha küçük */
-    box-shadow: 0 0 4px rgba(255, 255, 255, 0.7);
-    animation: dust-float infinite alternate ease-in-out;
+    position: absolute; background: #fff; border-radius: 50%; width: 2px; height: 2px;
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+    animation: twinkle 4s infinite ease-in-out;
+  }
+  @keyframes twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+
+  /* --- GİRİŞ EKRANI (CAM FANUS) --- */
+  .intro-wrapper {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 10;
+    transition: opacity 1s ease-in-out;
+  }
+  
+  /* BUZLU CAM KUTUSU (Yazıyı koruyan kalkan) */
+  .glass-pane {
+    background: rgba(255, 255, 255, 0.03); /* Çok şeffaf beyaz */
+    backdrop-filter: blur(12px); /* Arkadaki karmaşayı flulaştırır */
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    padding: 4rem 6rem;
+    border-radius: 2rem;
+    text-align: center;
+    
+    /* Kutu Süzülme Animasyonu */
+    animation: float-box 6s ease-in-out infinite;
   }
 
-  .star-sparkle {
-    position: absolute; background: #fbbf24;
-    width: 4px; height: 4px; border-radius: 50%;
-    animation: gold-pulse infinite alternate ease-in-out;
-    box-shadow: 0 0 12px rgba(251, 191, 36, 0.7);
-  }
-  .star-sparkle::before, .star-sparkle::after {
-    content: ''; position: absolute; top: 50%; left: 50%;
-    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8), transparent);
-    width: 20px; height: 1px; transform: translate(-50%, -50%);
-  }
-  .star-sparkle::after { transform: translate(-50%, -50%) rotate(90deg); }
-
-  @keyframes dust-float {
-    0% { opacity: 0.2; transform: translateY(0) scale(0.8); }
-    100% { opacity: 0.8; transform: translateY(-30px) scale(1.2); }
-  }
-  @keyframes gold-pulse {
-    0% { opacity: 0.4; transform: scale(0.8); }
-    100% { opacity: 1; transform: scale(1.3); }
+  @keyframes float-box {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
   }
 
-  /* --- GEÇİŞ EFEKTLERİ --- */
-  .warping .star-small, .warping .star-sparkle {
+  /* Başlık Işıltısı (Shimmer) */
+  .shimmer-text {
+    font-size: 5rem; font-weight: 700; 
+    background: linear-gradient(to right, #94a3b8 20%, #ffffff 50%, #94a3b8 80%);
+    background-size: 200% auto;
+    color: transparent; -webkit-background-clip: text; background-clip: text;
+    animation: shine 5s linear infinite;
+    margin-bottom: 1rem;
+  }
+  @media (min-width: 768px) { .shimmer-text { font-size: 7rem; } }
+
+  @keyframes shine { to { background-position: 200% center; } }
+
+  .subtitle-clean {
+    color: #cbd5e1; letter-spacing: 0.6em; text-transform: uppercase;
+    font-size: 1.2rem; margin-bottom: 3rem; opacity: 0.8;
+  }
+
+  /* Buton (Pulse Efekti) */
+  .glow-btn {
+    padding: 1rem 3.5rem; font-size: 1.2rem; letter-spacing: 0.2em;
+    color: #fff; background: transparent;
+    border: 1px solid rgba(255,255,255,0.4); border-radius: 50px;
+    cursor: pointer; position: relative; overflow: hidden;
+    transition: all 0.4s;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+  }
+  .glow-btn:hover {
+    background: rgba(255,255,255,0.1); border-color: #fff;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+  }
+  .glow-btn::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
+  }
+  .glow-btn:hover::before { left: 100%; }
+
+  /* --- GEÇİŞ (WARP) --- */
+  .warping .glass-pane {
+    transform: scale(0.8) translateZ(-500px); opacity: 0; transition: all 1s ease-in;
+  }
+  .warping .star-small {
     transition: transform 1.5s ease-in;
-    transform: scale(0) translateZ(-1000px) !important; 
-    opacity: 0.5; 
+    transform: scale(0) translateZ(-1000px); opacity: 0;
+  }
+  .warping .aurora-blob {
+    transition: opacity 1.5s; opacity: 0;
   }
 
-  /* --- GİRİŞ EKRANI DÜZENLEMESİ (Vinyet Efekti) --- */
-  .intro-container {
-    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;
-    transition: opacity 1.2s ease-in-out;
-  }
-
-  /* YENİ: Yazının arkasına koyu bir odak (vinyet) ekleyerek yıldızları bastırıyoruz */
-  .intro-container::before {
-    content: '';
-    position: absolute;
-    inset: -20%; /* Ekrandan biraz daha taşsın */
-    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.7) 0%, rgba(15, 23, 42, 0.3) 40%, transparent 70%);
-    z-index: -1; /* Yazının arkasında */
-    pointer-events: none;
-  }
-  
-  /* Yazı Animasyonu */
-  .extreme-zoom-in {
-    animation: extreme-zoom 2s cubic-bezier(0.19, 1, 0.22, 1) forwards; 
-    opacity: 0; transform-origin: center center;
-  }
-  @keyframes extreme-zoom {
-    0% { opacity: 0; transform: scale(0.8) translateZ(-1000px); letter-spacing: -20px; filter: blur(10px); }
-    100% { opacity: 1; transform: scale(1) translateZ(0); letter-spacing: normal; filter: blur(0); }
-  }
-  
-  /* Başlık Parlaması (Daha net ve okunaklı) */
-  .title-glow {
-    color: #ffffff; 
-    /* Dış parlama azaltıldı, iç parlama artırıldı */
-    text-shadow: 0 0 10px rgba(255,255,255,0.9), 0 0 25px rgba(14, 165, 233, 0.3);
-  }
-  .subtitle-light {
-    color: #e0f2fe; /* Biraz daha açık mavi */
-    letter-spacing: 0.5em; text-shadow: 0 0 10px rgba(186, 230, 253, 0.4);
-    font-weight: 400; /* Biraz daha kalın */
-  }
-
-  .start-btn {
-    padding: 1.2rem 4rem; font-size: 1.3rem; 
-    color: #0c4a6e; background: rgba(255, 255, 255, 0.95); 
-    border: none; border-radius: 50px; cursor: pointer; margin-top: 3rem;
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
-    transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700;
-  }
-  .start-btn:hover {
-    transform: scale(1.05); box-shadow: 0 0 40px rgba(255, 255, 255, 0.6); background: #fff;
-  }
-
-  /* --- KART GÖRÜNÜMÜ --- */
+  /* --- KART STİLLERİ (Öncekiyle Aynı) --- */
   .content-container {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 20; perspective: 1200px;
   }
@@ -135,10 +135,10 @@ const styles = `
 
   .crystal-card {
     width: 90%; max-width: 600px;
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255,255,255, 0.2) inset, 0 0 30px rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.1); /* Biraz daha koyu kart */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255,255,255, 0.1) inset;
+    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
     border-radius: 40px; padding: 3rem 2rem;
     text-align: center; position: relative;
   }
@@ -146,38 +146,31 @@ const styles = `
   .gold-mist-text {
     background: linear-gradient(to bottom, #fffbeb 0%, #fbbf24 50%, #d97706 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
-    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6)) drop-shadow(0 0 20px rgba(251, 191, 36, 0.3));
+    filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.4));
   }
-  .transliteration-mist { 
-    color: #e0f2fe; font-weight: 300; text-shadow: 0 0 10px rgba(224, 242, 254, 0.6); 
-  }
-  .meaning-mist { 
-    color: #ffffff; font-weight: 500; text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-
+  .transliteration-mist { color: #e0f2fe; text-shadow: 0 0 10px rgba(224, 242, 254, 0.4); }
+  .meaning-mist { color: #f1f5f9; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+  
   .question-box {
-    background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 1rem; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem; padding: 1.5rem;
   }
-  .question-text { 
-    color: #bae6fd; font-style: italic; text-shadow: 0 0 5px rgba(186, 230, 253, 0.4);
-  }
+  .question-text { color: #bae6fd; font-style: italic; }
 
   .action-btn {
     border: 1px solid #fbbf24; color: #fbbf24; background: rgba(0,0,0,0.2);
     padding: 1rem 2.5rem; border-radius: 999px; margin-top: 2rem;
     text-transform: uppercase; letter-spacing: 0.15em; font-size: 0.85rem; font-weight: 600;
-    transition: all 0.3s; box-shadow: 0 0 10px rgba(251, 191, 36, 0.1);
+    transition: all 0.3s;
   }
   .action-btn:hover {
-    background: #fbbf24; color: #0c4a6e; transform: scale(1.05); box-shadow: 0 0 25px rgba(251, 191, 36, 0.6);
+    background: #fbbf24; color: #0c4a6e; transform: scale(1.05); box-shadow: 0 0 25px rgba(251, 191, 36, 0.5);
   }
   
   .fade-wrapper { transition: all 0.5s ease; }
   .fade-out { opacity: 0; transform: scale(1.1); filter: blur(10px); }
   .fade-in { opacity: 1; transform: scale(1); filter: blur(0); }
 `;
-
 // ==========================================
 // 2. VERİ SETİ (99 İSİM)
 // ==========================================
