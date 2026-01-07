@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 // ==========================================
-// 1. CSS STİLLERİ (Hiyerarşi Düzenlendi)
+// 1. CSS STİLLERİ (Yıldızlar, Giriş ve Kart Dahil)
 // ==========================================
 const styles = `
   /* FONT AİLESİ */
@@ -13,13 +13,26 @@ const styles = `
   .dua-font { fontFamily: 'Playfair Display', serif; font-style: italic; }
 
   /* --- SAYFA YAPISI --- */
-  body, html { margin: 0; padding: 0; background-color: #0f172a; overflow: hidden; height: 100%; width: 100%; }
+  body, html { margin: 0; padding: 0; background-color: #020617; overflow: hidden; height: 100%; width: 100%; }
 
-  /* --- ARKA PLAN --- */
+  /* --- ARKA PLAN VE YILDIZLAR --- */
   .heavenly-background {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: radial-gradient(circle at center bottom, #1e293b 0%, #0f172a 40%, #020617 100%);
     z-index: 0; overflow: hidden;
+  }
+
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle var(--duration) ease-in-out infinite;
+    animation-delay: var(--delay);
+  }
+  @keyframes twinkle {
+    0% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: var(--opacity); transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.5); }
   }
 
   .light-beams {
@@ -37,8 +50,35 @@ const styles = `
     filter: blur(80px); z-index: 2;
   }
 
+  /* --- GİRİŞ EKRANI (INTRO) --- */
+  .intro-container {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 30; text-align: center; color: white;
+    transition: opacity 1s ease, transform 1s ease;
+  }
+  .intro-title {
+    font-size: 4rem; font-family: 'Cinzel', serif; letter-spacing: 0.2em;
+    background: linear-gradient(to right, #fbbf24, #fffbeb, #fbbf24);
+    -webkit-background-clip: text; color: transparent;
+    text-shadow: 0 0 30px rgba(251, 191, 36, 0.3); margin-bottom: 2rem;
+  }
+  .start-btn {
+    padding: 1rem 3rem; font-size: 1.2rem; letter-spacing: 0.15em; text-transform: uppercase;
+    background: transparent; border: 1px solid rgba(251, 191, 36, 0.4); color: #fbbf24;
+    cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden;
+    font-family: 'Cinzel', serif;
+  }
+  .start-btn:hover { background: rgba(251, 191, 36, 0.1); box-shadow: 0 0 20px rgba(251, 191, 36, 0.2); transform: translateY(-2px); }
+  
+  .hidden-intro { opacity: 0; pointer-events: none; transform: scale(1.1); }
+
   /* --- KART VE İÇERİK --- */
-  .content-container { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 20; perspective: 1000px; }
+  .content-container { 
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; 
+    z-index: 20; perspective: 1000px; 
+    opacity: 0; pointer-events: none; transition: opacity 1s ease 0.5s;
+  }
+  .content-visible { opacity: 1; pointer-events: auto; }
 
   .crystal-card {
     width: 90%; max-width: 550px; max-height: 90vh;
@@ -68,53 +108,35 @@ const styles = `
   
   /* 2. OKUNUŞ */
   .transliteration {
-    font-family: 'Cinzel', serif;
-    color: #bae6fd;
-    font-size: 1.5rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 1.5rem;
-    opacity: 0.9;
+    font-family: 'Cinzel', serif; color: #bae6fd; font-size: 1.5rem;
+    letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1.5rem; opacity: 0.9;
   }
 
   .divider { width: 60px; height: 1px; background: rgba(251, 191, 36, 0.5); margin: 0 auto 1.5rem auto; }
 
   /* 3. ANLAM */
   .meaning-box {
-    margin-bottom: 2rem;
-    color: #f1f5f9;
-    font-family: 'Inter', sans-serif;
-    font-weight: 300;
-    font-size: 1rem;
-    line-height: 1.6;
+    margin-bottom: 2rem; color: #f1f5f9; font-family: 'Inter', sans-serif;
+    font-weight: 300; font-size: 1rem; line-height: 1.6;
   }
 
   /* 4. SORU (TEFEKKÜR) */
   .question-wrapper {
-    background: rgba(14, 165, 233, 0.1);
-    border-left: 3px solid #38bdf8;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    text-align: left;
-    border-radius: 0 10px 10px 0;
+    background: rgba(14, 165, 233, 0.1); border-left: 3px solid #38bdf8;
+    padding: 1rem; margin-bottom: 1.5rem; text-align: left; border-radius: 0 10px 10px 0;
   }
   .question-label {
     display: block; font-size: 0.75rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; font-weight: 700;
   }
   .question-text {
-    font-family: 'Inter', sans-serif;
-    color: #e0f2fe;
-    font-style: italic;
-    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif; color: #e0f2fe; font-style: italic; font-size: 0.95rem;
   }
 
   /* 5. DUA */
   .dua-wrapper {
-    position: relative;
-    padding: 1.5rem;
+    position: relative; padding: 1.5rem;
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(251, 191, 36, 0.05) 100%);
-    border-radius: 16px;
-    border: 1px solid rgba(251, 191, 36, 0.15);
+    border-radius: 16px; border: 1px solid rgba(251, 191, 36, 0.15);
   }
   .dua-label {
     position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
@@ -123,17 +145,13 @@ const styles = `
     text-transform: uppercase; letter-spacing: 0.1em;
   }
   .dua-text {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 1.1rem;
-    color: #fcd34d;
-    line-height: 1.6;
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 1.1rem; color: #fcd34d; line-height: 1.6;
   }
 
   .nav-btn {
     width: 100%; padding: 1.2rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05); border-top: 1px solid rgba(255, 255, 255, 0.1);
     color: #94a3b8; text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.8rem; font-weight: 600;
     cursor: pointer; transition: all 0.3s;
   }
@@ -143,7 +161,6 @@ const styles = `
   .fade-out { opacity: 0; transform: scale(0.98); }
   .fade-in { opacity: 1; transform: scale(1); }
 `;
-
 // ==========================================
 // 2. TAM VERİ SETİ (SIRALI BİRLEŞTİRİLMİŞ)
 // ==========================================
@@ -253,16 +270,47 @@ const esmaData = [
 // 3. UYGULAMA MANTIĞI
 // ==========================================
 function App() {
+  const [started, setStarted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [fading, setFading] = useState(false);
-  
-  // Sıradaki isme geçiş (Döngüsel)
+  const [stars, setStars] = useState([]);
+
+  // Yıldızları oluştur
+  useEffect(() => {
+    const starArray = Array.from({ length: 50 }).map((_, i) => ({
+      id: i,
+      left: Math.random() * 100 + '%',
+      top: Math.random() * 100 + '%',
+      size: Math.random() * 2 + 1 + 'px',
+      delay: Math.random() * 5 + 's',
+      duration: Math.random() * 3 + 2 + 's',
+      opacity: Math.random() * 0.7 + 0.3
+    }));
+    setStars(starArray);
+  }, []);
+
+  // Rastgele bir index seç (Mevcut olan hariç)
+  const getRandomIndex = () => {
+    let newIndex;
+    do {
+      newIndex = Math.floor(Math.random() * esmaData.length);
+    } while (newIndex === currentIndex && esmaData.length > 1);
+    return newIndex;
+  };
+
+  const handleStart = () => {
+    // Başlarken de rastgele bir isimle başla
+    setCurrentIndex(getRandomIndex());
+    setStarted(true);
+  };
+
   const handleNext = () => {
     setFading(true);
     setTimeout(() => {
-      setCurrentIndex((prev) => (prev + 1) % esmaData.length);
+      // Rastgele (Karışık) seçim
+      setCurrentIndex(getRandomIndex());
       setFading(false);
-    }, 500); // Yarım saniyelik geçiş süresi
+    }, 500);
   };
 
   const currentEsma = esmaData[currentIndex];
@@ -275,10 +323,33 @@ function App() {
       <div className="heavenly-background">
         <div className="light-beams"></div>
         <div className="nebula"></div>
+        {stars.map((star) => (
+          <div
+            key={star.id}
+            className="star"
+            style={{
+              left: star.left,
+              top: star.top,
+              width: star.size,
+              height: star.size,
+              '--delay': star.delay,
+              '--duration': star.duration,
+              '--opacity': star.opacity
+            }}
+          />
+        ))}
       </div>
 
-      {/* İÇERİK */}
-      <div className="content-container">
+      {/* GİRİŞ EKRANI (Landing) */}
+      <div className={`intro-container ${started ? 'hidden-intro' : ''}`}>
+        <h1 className="intro-title">ESMA-ÜL HÜSNA</h1>
+        <button onClick={handleStart} className="start-btn">
+          BAŞLA
+        </button>
+      </div>
+
+      {/* İÇERİK KARTI */}
+      <div className={`content-container ${started ? 'content-visible' : ''}`}>
         <div className="crystal-card">
           
           <div className="card-scroll-area">
