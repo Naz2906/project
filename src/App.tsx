@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 // ==========================================
-// 1. CSS: SİNEMATİK EFEKTLER & ATMOSFER
+// 1. CSS: AYDINLIK GÖK & KRİSTAL MAVİ TEMA
 // ==========================================
 const styles = `
   /* FONT AİLESİ */
@@ -10,48 +10,56 @@ const styles = `
   /* --- GENEL AYARLAR --- */
   body, html { margin: 0; padding: 0; background-color: #000; overflow: hidden; height: 100%; width: 100%; font-family: 'Inter', sans-serif; }
 
-  /* --- KOZMİK ARKA PLAN --- */
+  /* --- AYDINLIK KOZMİK ARKA PLAN --- */
   .cosmos-container {
     position: fixed; inset: 0; width: 100%; height: 100%;
-    background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+    /* Mavi-Mor-Siyah geçişli derin ama aydınlık zemin */
+    background: radial-gradient(ellipse at bottom, #1e40af 0%, #0f172a 60%, #020617 100%);
     overflow: hidden; z-index: 0;
+  }
+
+  .nebula-bright {
+    position: absolute; width: 100%; height: 100%;
+    background: radial-gradient(circle at 30% 20%, rgba(125, 211, 252, 0.15) 0%, transparent 50%), 
+                radial-gradient(circle at 70% 80%, rgba(192, 132, 252, 0.15) 0%, transparent 50%);
+    filter: blur(100px); z-index: 1;
   }
   
   /* Durgun Yıldızlar */
   .stars-layer {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    background: transparent;
-    animation: zoom-slow 100s linear infinite;
+    background: transparent; z-index: 2;
+    animation: zoom-slow 120s linear infinite;
   }
-  @keyframes zoom-slow { 0% { transform: scale(1); } 100% { transform: scale(1.5); } }
+  @keyframes zoom-slow { 0% { transform: scale(1); } 100% { transform: scale(1.3); } }
 
   .star-static {
-    position: absolute; background: white; border-radius: 50%;
-    box-shadow: 0 0 2px rgba(255,255,255,0.8);
+    position: absolute; background: #e0f2fe; border-radius: 50%;
+    box-shadow: 0 0 4px rgba(224, 242, 254, 0.8), 0 0 8px rgba(125, 211, 252, 0.4);
     animation: twinkle var(--dur) ease-in-out infinite alternate;
   }
-  @keyframes twinkle { 0% { opacity: 0.2; } 100% { opacity: 1; box-shadow: 0 0 4px white; } }
+  @keyframes twinkle { 0% { opacity: 0.3; scale: 0.8; } 100% { opacity: 1; scale: 1.1; box-shadow: 0 0 6px #fff; } }
 
-  /* Kayan Yıldızlar (Shooting Stars) */
+  /* Kayan Yıldızlar (Beyaz/Mavi) */
   .shooting-star {
-    position: absolute; top: 50%; left: 50%; height: 2px;
-    background: linear-gradient(-45deg, rgba(255,255,255,1), rgba(0,0,255,0));
-    filter: drop-shadow(0 0 6px rgba(255,215,0,0.8));
+    position: absolute; top: 50%; left: 50%; height: 2px; z-index: 3;
+    background: linear-gradient(-45deg, #ffffff, rgba(125, 211, 252, 0));
+    filter: drop-shadow(0 0 6px rgba(125, 211, 252, 0.8));
     border-radius: 999px; opacity: 0;
     transform: rotate(-45deg) translateX(0);
-    animation: shoot 6s ease-in-out infinite;
+    animation: shoot 8s ease-in-out infinite;
     animation-delay: var(--delay);
     width: var(--len);
   }
   .shooting-star::before {
     content: ''; position: absolute; top: 50%; transform: translateY(-50%);
     right: 0; height: 4px; width: 4px; background: #fff; border-radius: 50%;
-    box-shadow: 0 0 10px #fff, 0 0 20px #fbbf24;
+    box-shadow: 0 0 15px #fff, 0 0 30px #38bdf8;
   }
   @keyframes shoot {
     0% { opacity: 0; transform: rotate(-45deg) translateX(0) translateY(0); }
     10% { opacity: 1; }
-    20% { opacity: 0; transform: rotate(-45deg) translateX(-1000px) translateY(1000px); }
+    20% { opacity: 0; transform: rotate(-45deg) translateX(-1200px) translateY(1200px); }
     100% { opacity: 0; }
   }
 
@@ -59,53 +67,53 @@ const styles = `
   .intro-overlay {
     position: absolute; inset: 0; z-index: 50;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: rgba(0,0,0,0.2);
+    background: radial-gradient(circle, rgba(15, 23, 42, 0.4) 0%, rgba(2, 6, 23, 0.8) 100%);
     transition: all 1.2s cubic-bezier(0.7, 0, 0.3, 1);
   }
   
-  /* Portal Efekti (Başla'ya basınca çalışır) */
   .intro-overlay.zoom-out {
-    opacity: 0; transform: scale(2); filter: blur(20px); pointer-events: none;
+    opacity: 0; transform: scale(2.5); filter: blur(30px); pointer-events: none;
   }
 
   .intro-title-wrapper { position: relative; margin-bottom: 3rem; text-align: center; }
   
   .intro-title {
     font-family: 'Cinzel', serif; font-size: 5rem; font-weight: 800; letter-spacing: 0.15em;
-    background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+    background: linear-gradient(to right, #e0f2fe, #7dd3fc, #ffffff, #38bdf8, #e0f2fe);
     -webkit-background-clip: text; color: transparent;
-    text-shadow: 0 0 50px rgba(251, 191, 36, 0.3);
-    animation: shine 5s linear infinite; background-size: 200%;
+    text-shadow: 0 0 60px rgba(56, 189, 248, 0.5);
+    animation: shine 6s linear infinite; background-size: 200%;
   }
   @media (max-width: 768px) { .intro-title { font-size: 3rem; } }
 
   .intro-subtitle {
-    font-family: 'Scheherazade New', serif; font-size: 2.5rem; color: #fbbf24;
-    margin-top: -10px; opacity: 0.8; letter-spacing: 0.05em;
+    font-family: 'Scheherazade New', serif; font-size: 2.5rem; color: #bae6fd;
+    margin-top: -10px; opacity: 0.9; letter-spacing: 0.05em;
+    text-shadow: 0 0 15px rgba(125, 211, 252, 0.4);
     animation: float 4s ease-in-out infinite;
   }
-
   @keyframes shine { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
   @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
   .glow-btn {
     position: relative; padding: 1.2rem 4rem; font-size: 1.2rem;
-    font-family: 'Cinzel', serif; letter-spacing: 0.2em; text-transform: uppercase; color: #fff;
-    background: transparent; border: 1px solid rgba(255, 215, 0, 0.3);
+    font-family: 'Cinzel', serif; letter-spacing: 0.2em; text-transform: uppercase; color: #e0f2fe;
+    background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(125, 211, 252, 0.4);
     cursor: pointer; overflow: hidden; transition: 0.5s;
-    box-shadow: 0 0 10px rgba(251, 191, 36, 0.1);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+    border-radius: 4px;
   }
   .glow-btn::before {
-    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.4), transparent);
-    transition: 0.5s;
+    content: ''; position: absolute; top: 0; left: -100%; width: 200%; height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    transition: 0.7s; transform: skewX(-20deg);
   }
   .glow-btn:hover {
-    background: rgba(251, 191, 36, 0.1);
-    box-shadow: 0 0 30px rgba(251, 191, 36, 0.4), 0 0 60px rgba(251, 191, 36, 0.2);
-    border-color: #fbbf24; transform: scale(1.05);
+    background: rgba(56, 189, 248, 0.2); color: white;
+    box-shadow: 0 0 40px rgba(56, 189, 248, 0.5), 0 0 80px rgba(56, 189, 248, 0.3);
+    border-color: #7dd3fc; transform: scale(1.05); letter-spacing: 0.25em;
   }
-  .glow-btn:hover::before { left: 100%; transition: 0.5s; }
+  .glow-btn:hover::before { left: 100%; }
 
   /* --- KART ALANI --- */
   .main-content {
@@ -114,85 +122,89 @@ const styles = `
     opacity: 0; transform: translateY(50px) scale(0.9); pointer-events: none;
     transition: opacity 1.5s ease 0.5s, transform 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.5s;
   }
-  .main-content.visible {
-    opacity: 1; transform: translateY(0) scale(1); pointer-events: auto;
-  }
+  .main-content.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
 
   .glass-card {
     width: 90%; max-width: 500px; max-height: 85vh;
-    background: rgba(16, 20, 35, 0.65);
-    border: 1px solid rgba(255, 215, 0, 0.15);
-    border-top: 1px solid rgba(255, 215, 0, 0.3);
-    border-bottom: 1px solid rgba(255, 215, 0, 0.05);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-    border-radius: 24px; padding: 0;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(125, 211, 252, 0.2);
+    border-top: 1px solid rgba(125, 211, 252, 0.4);
+    border-bottom: 1px solid rgba(125, 211, 252, 0.1);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255, 255, 255, 0.1) inset, 0 0 30px rgba(56, 189, 248, 0.2);
+    backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
+    border-radius: 30px; padding: 0;
     display: flex; flex-direction: column; overflow: hidden;
     animation: card-float 8s ease-in-out infinite;
   }
-  @keyframes card-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  @keyframes card-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 
   .card-inner {
     padding: 2.5rem 2rem; overflow-y: auto; text-align: center;
-    scrollbar-width: thin; scrollbar-color: rgba(251, 191, 36, 0.3) transparent;
+    scrollbar-width: thin; scrollbar-color: rgba(56, 189, 248, 0.3) transparent;
   }
   
-  /* İçerik Yazıları */
   .arabic-title {
     font-family: 'Scheherazade New', serif; font-size: 5.5rem; line-height: 1.1;
-    background: linear-gradient(180deg, #fff 0%, #fbbf24 100%);
+    background: linear-gradient(180deg, #ffffff 0%, #38bdf8 100%);
     -webkit-background-clip: text; color: transparent;
-    filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.5));
-    margin-bottom: 0.5rem; animation: pulse-gold 3s infinite alternate;
+    filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.6));
+    margin-bottom: 0.5rem; animation: pulse-blue 3s infinite alternate;
   }
-  @keyframes pulse-gold { 0% { filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.3)); } 100% { filter: drop-shadow(0 0 25px rgba(251, 191, 36, 0.7)); } }
+  @keyframes pulse-blue { 0% { filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.4)); } 100% { filter: drop-shadow(0 0 30px rgba(56, 189, 248, 0.8)); } }
 
   .reading-text {
     font-family: 'Cinzel', serif; font-size: 1.4rem; color: #bae6fd;
     letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1.5rem;
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
   }
 
-  .golden-divider {
-    height: 1px; width: 60px; background: linear-gradient(90deg, transparent, #fbbf24, transparent);
-    margin: 0 auto 1.5rem auto;
+  .blue-divider {
+    height: 1px; width: 80px; background: linear-gradient(90deg, transparent, #7dd3fc, transparent);
+    margin: 0 auto 1.5rem auto; opacity: 0.7;
   }
 
   .meaning-text {
-    font-family: 'Inter', sans-serif; font-weight: 300; font-size: 1.05rem; color: #e2e8f0; line-height: 1.6; margin-bottom: 2rem;
+    font-family: 'Inter', sans-serif; font-weight: 300; font-size: 1.1rem; color: #e0f2fe; line-height: 1.7; margin-bottom: 2rem;
   }
 
   .box-tefekkur {
-    background: rgba(14, 165, 233, 0.08); border-left: 2px solid #38bdf8;
+    background: rgba(14, 165, 233, 0.1); border-left: 3px solid #38bdf8;
     padding: 1.2rem; margin-bottom: 1.5rem; text-align: left; border-radius: 0 12px 12px 0;
+    box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.05);
   }
-  .box-tefekkur h4 { margin: 0 0 0.5rem 0; font-size: 0.75rem; color: #38bdf8; letter-spacing: 0.15em; text-transform: uppercase; }
-  .box-tefekkur p { margin: 0; font-style: italic; color: #bae6fd; font-size: 0.95rem; }
+  .box-tefekkur h4 { margin: 0 0 0.5rem 0; font-size: 0.8rem; color: #7dd3fc; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; }
+  .box-tefekkur p { margin: 0; font-style: italic; color: #bae6fd; font-size: 1rem; }
 
   .box-dua {
-    position: relative; padding: 1.5rem; border-radius: 16px;
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.05), transparent);
-    border: 1px solid rgba(251, 191, 36, 0.1); margin-top: 1rem;
+    position: relative; padding: 1.8rem 1.5rem 1.5rem 1.5rem; border-radius: 16px;
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), transparent);
+    border: 1px solid rgba(125, 211, 252, 0.2); margin-top: 1rem;
+    box-shadow: 0 10px 30px -10px rgba(14, 165, 233, 0.3);
   }
   .dua-badge {
-    position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-    background: #0f172a; border: 1px solid #fbbf24; color: #fbbf24;
-    padding: 2px 12px; border-radius: 20px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: #0f172a; border: 1px solid #38bdf8; color: #38bdf8;
+    padding: 4px 16px; border-radius: 20px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
   }
   .box-dua p {
-    font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.15rem; color: #fcd34d; margin: 0;
+    font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.2rem; color: #e0f2fe; margin: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
   }
 
   .next-btn {
     width: 100%; padding: 1.5rem; cursor: pointer;
-    background: rgba(255, 255, 255, 0.03); border: none; border-top: 1px solid rgba(255, 255, 255, 0.1);
-    color: #94a3b8; font-family: 'Cinzel', serif; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
-    transition: all 0.3s ease;
+    background: rgba(56, 189, 248, 0.05); border: none; border-top: 1px solid rgba(125, 211, 252, 0.2);
+    color: #bae6fd; font-family: 'Cinzel', serif; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
+    transition: all 0.4s ease;
   }
-  .next-btn:hover { background: rgba(251, 191, 36, 0.15); color: #fbbf24; letter-spacing: 0.35em; }
+  .next-btn:hover { 
+    background: rgba(56, 189, 248, 0.2); color: #fff; letter-spacing: 0.4em;
+    box-shadow: 0 -10px 30px rgba(56, 189, 248, 0.2);
+  }
 
-  /* İçerik Geçiş Animasyonu */
   .fade-content { transition: opacity 0.6s ease, transform 0.6s ease; }
-  .fade-out { opacity: 0; transform: translateY(10px) scale(0.95); filter: blur(5px); }
+  .fade-out { opacity: 0; transform: translateY(15px) scale(0.97); filter: blur(8px); }
   .fade-in { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 `;
 // ==========================================
