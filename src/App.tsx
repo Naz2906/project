@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 // ==========================================
-// 1. CSS STİLLERİ (GÖK YÜZÜ & NUR KONSEPTİ)
+// 1. CSS STİLLERİ (GÜNCELLENMİŞ GİRİŞ EKRANI)
 // ==========================================
 const styles = `
   /* FONT AİLESİ */
@@ -24,118 +24,113 @@ const styles = `
     perspective: 1000px;
   }
 
-  /* Işık Bulutları */
+  /* Işık Bulutları (Nebula) */
   .nebula {
     position: absolute; width: 100%; height: 100%;
     background: 
-      radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
-      radial-gradient(circle at 10% 80%, rgba(253, 224, 71, 0.3) 0%, transparent 40%);
-    filter: blur(60px);
-    animation: light-move 20s infinite alternate ease-in-out;
+      radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.3) 0%, transparent 60%), /* Biraz daha şeffaf */
+      radial-gradient(circle at 10% 80%, rgba(253, 224, 71, 0.2) 0%, transparent 50%);
+    filter: blur(70px); /* Daha fazla bulanıklık */
+    animation: light-move 25s infinite alternate ease-in-out; /* Daha yavaş hareket */
   }
-  @keyframes light-move { from { transform: scale(1); opacity: 0.7; } to { transform: scale(1.1); opacity: 0.9; } }
+  @keyframes light-move { from { transform: scale(1); opacity: 0.6; } to { transform: scale(1.1); opacity: 0.8; } }
 
   /* --- PARÇACIK SİSTEMİ --- */
-  .star-field { position: absolute; width: 100%; height: 100%; transform-style: preserve-3d; }
+  .star-field { position: absolute; width: 100%; height: 100%; transform-style: preserve-3d; z-index: 1; }
 
   .star-small {
     position: absolute; background: #fff;
-    border-radius: 50%; width: 3px; height: 3px;
-    box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+    border-radius: 50%; width: 2px; height: 2px; /* Biraz daha küçük */
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.7);
     animation: dust-float infinite alternate ease-in-out;
   }
 
   .star-sparkle {
     position: absolute; background: #fbbf24;
-    width: 5px; height: 5px; border-radius: 50%;
+    width: 4px; height: 4px; border-radius: 50%;
     animation: gold-pulse infinite alternate ease-in-out;
-    box-shadow: 0 0 15px rgba(251, 191, 36, 0.8);
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.7);
   }
   .star-sparkle::before, .star-sparkle::after {
     content: ''; position: absolute; top: 50%; left: 50%;
-    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.9), transparent);
-    width: 30px; height: 1px; transform: translate(-50%, -50%);
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8), transparent);
+    width: 20px; height: 1px; transform: translate(-50%, -50%);
   }
   .star-sparkle::after { transform: translate(-50%, -50%) rotate(90deg); }
 
   @keyframes dust-float {
-    0% { opacity: 0.3; transform: translateY(0) scale(0.8); }
-    100% { opacity: 0.9; transform: translateY(-30px) scale(1.2); }
+    0% { opacity: 0.2; transform: translateY(0) scale(0.8); }
+    100% { opacity: 0.8; transform: translateY(-30px) scale(1.2); }
   }
   @keyframes gold-pulse {
-    0% { opacity: 0.5; transform: scale(0.8); }
+    0% { opacity: 0.4; transform: scale(0.8); }
     100% { opacity: 1; transform: scale(1.3); }
   }
 
-  /* --- IŞIK HUZMELERİ --- */
-  .shooting-star-layer { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
-  .shooting-star {
-    position: absolute; width: 400px; height: 1px;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), transparent);
-    filter: drop-shadow(0 0 8px rgba(255,255,255,0.8)); 
-    opacity: 0; transform: rotate(-45deg); 
-    animation: light-beam 6s infinite ease-out;
-  }
-  @keyframes light-beam {
-    0% { opacity: 0; transform: rotate(-45deg) translateX(0) scale(0.8); }
-    20% { opacity: 0.5; }
-    40% { opacity: 0; transform: rotate(-45deg) translateX(-1000px) scale(1.1); }
-    100% { opacity: 0; }
-  }
-
-  /* --- GEÇİŞ VE EFEKTLER --- */
+  /* --- GEÇİŞ EFEKTLERİ --- */
   .warping .star-small, .warping .star-sparkle {
-    transition: transform 1.5s ease-in, opacity 1.5s ease-in;
-    transform: scale(0) translateZ(-2000px) !important;
-    opacity: 0;
+    transition: transform 1.5s ease-in;
+    transform: scale(0) translateZ(-1000px) !important; 
+    opacity: 0.5; 
   }
 
-  .light-flash {
-    position: absolute; inset: 0; background: #fff;
-    opacity: 0; pointer-events: none; z-index: 100;
-    transition: opacity 0.8s ease-out;
-  }
-  .flash-active { opacity: 1; }
-
+  /* --- GİRİŞ EKRANI DÜZENLEMESİ (Vinyet Efekti) --- */
   .intro-container {
     position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;
+    transition: opacity 1.2s ease-in-out;
+  }
+
+  /* YENİ: Yazının arkasına koyu bir odak (vinyet) ekleyerek yıldızları bastırıyoruz */
+  .intro-container::before {
+    content: '';
+    position: absolute;
+    inset: -20%; /* Ekrandan biraz daha taşsın */
+    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.7) 0%, rgba(15, 23, 42, 0.3) 40%, transparent 70%);
+    z-index: -1; /* Yazının arkasında */
+    pointer-events: none;
   }
   
+  /* Yazı Animasyonu */
   .extreme-zoom-in {
     animation: extreme-zoom 2s cubic-bezier(0.19, 1, 0.22, 1) forwards; 
     opacity: 0; transform-origin: center center;
   }
   @keyframes extreme-zoom {
-    0% { opacity: 0; transform: scale(0) translateZ(-5000px); letter-spacing: -50px; filter: blur(20px); }
+    0% { opacity: 0; transform: scale(0.8) translateZ(-1000px); letter-spacing: -20px; filter: blur(10px); }
     100% { opacity: 1; transform: scale(1) translateZ(0); letter-spacing: normal; filter: blur(0); }
   }
   
+  /* Başlık Parlaması (Daha net ve okunaklı) */
   .title-glow {
-    color: #ffffff; text-shadow: 0 0 20px rgba(255,255,255,0.6), 0 0 40px rgba(14, 165, 233, 0.4);
+    color: #ffffff; 
+    /* Dış parlama azaltıldı, iç parlama artırıldı */
+    text-shadow: 0 0 10px rgba(255,255,255,0.9), 0 0 25px rgba(14, 165, 233, 0.3);
   }
   .subtitle-light {
-    color: #bae6fd; letter-spacing: 0.5em; text-shadow: 0 0 10px rgba(186, 230, 253, 0.5);
+    color: #e0f2fe; /* Biraz daha açık mavi */
+    letter-spacing: 0.5em; text-shadow: 0 0 10px rgba(186, 230, 253, 0.4);
+    font-weight: 400; /* Biraz daha kalın */
   }
 
   .start-btn {
-    padding: 1.5rem 5rem; font-size: 1.5rem; 
-    color: #0c4a6e; background: rgba(255, 255, 255, 0.9); 
+    padding: 1.2rem 4rem; font-size: 1.3rem; 
+    color: #0c4a6e; background: rgba(255, 255, 255, 0.95); 
     border: none; border-radius: 50px; cursor: pointer; margin-top: 3rem;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
     transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700;
   }
   .start-btn:hover {
-    transform: scale(1.05); box-shadow: 0 0 40px rgba(255, 255, 255, 0.8); background: #fff;
+    transform: scale(1.05); box-shadow: 0 0 40px rgba(255, 255, 255, 0.6); background: #fff;
   }
 
   /* --- KART GÖRÜNÜMÜ --- */
   .content-container {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 20; perspective: 1200px;
   }
-  .card-explosion { animation: card-appear 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+  .card-explosion { animation: card-appear 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
   @keyframes card-appear {
-    from { opacity: 0; transform: scale(0.3) rotateX(10deg) translateZ(-200px); }
-    to { opacity: 1; transform: scale(1) rotateX(0) translateZ(0); }
+    from { opacity: 0; transform: scale(0.6) translateY(50px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
   }
 
   .crystal-card {
@@ -184,7 +179,7 @@ const styles = `
 `;
 
 // ==========================================
-// 2. VERİ SETİ (99 İSİM - TAM LİSTE)
+// 2. VERİ SETİ (99 İSİM)
 // ==========================================
 const esmaData = [
   { id: 1, arabic: 'اللَّهُ', transliteration: 'Allah', meaning: 'Kâinatın tek yaratıcısı.', question: 'Kendinden büyük bir güce teslim olmak sana ne hissettiriyor?' },
@@ -291,11 +286,8 @@ const esmaData = [
 // ==========================================
 // 3. YARDIMCI FONKSİYON: KARIŞTIRMA (SHUFFLE)
 // ==========================================
-// Fisher-Yates Algoritması ile diziyi karıştırır
 const shuffleArray = (array) => {
   let currentIndex = array.length,  randomIndex;
-
-  // Dizi bitene kadar rastgele bir eleman seç ve yer değiştir
   while (currentIndex !== 0) {
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
@@ -309,22 +301,20 @@ const shuffleArray = (array) => {
 // ==========================================
 function App() {
   const [viewState, setViewState] = useState('intro');
-  const [flash, setFlash] = useState(false); 
   const [contentFading, setContentFading] = useState(false);
   const [stars, setStars] = useState([]);
-  const [shootingStars, setShootingStars] = useState([]);
-
+  
   // Karıştırılmış Deste State'leri
-  const [shuffledDeck, setShuffledDeck] = useState([]); // Karışık liste
-  const [deckIndex, setDeckIndex] = useState(0); // Şu an kaçıncı sıradayız
-  const [currentEsma, setCurrentEsma] = useState(null); // Ekranda gösterilen esma
+  const [shuffledDeck, setShuffledDeck] = useState([]); 
+  const [deckIndex, setDeckIndex] = useState(0); 
+  const [currentEsma, setCurrentEsma] = useState(null); 
 
   useEffect(() => {
-    // 1. PARTİKÜLLERİ OLUŞTUR
-    const starCount = 200; 
+    // 1. PARTİKÜLLER (Yıldız sayısını biraz azalttık ve boyutlarını küçülttük CSS'te)
+    const starCount = 150; 
     const newStars = [];
     for (let i = 0; i < starCount; i++) {
-      const isSparkle = Math.random() > 0.90; 
+      const isSparkle = Math.random() > 0.92; 
       newStars.push({
         id: i,
         type: isSparkle ? 'sparkle' : 'small',
@@ -337,60 +327,38 @@ function App() {
       });
     }
     setStars(newStars);
-
-    // 2. IŞIK HUZMELERİ
-    const sStars = [];
-    for(let i = 0; i < 5; i++) {
-        sStars.push({
-            id: i,
-            style: {
-                top: `${Math.random() * 60}%`, 
-                left: `${Math.random() * 80}%`, 
-                animationDelay: `${Math.random() * 10}s`,
-                animationDuration: `${Math.random() * 2 + 5}s` 
-            }
-        });
-    }
-    setShootingStars(sStars);
     
-    // 3. DESTEYİ KARIŞTIR VE BAŞLAT
-    // Tüm listeyi kopyala ve karıştır
+    // 2. DESTEYİ KARIŞTIR
     const mixed = shuffleArray([...esmaData]);
     setShuffledDeck(mixed);
     setDeckIndex(0);
-    setCurrentEsma(mixed[0]); // İlk kartı ayarla
+    setCurrentEsma(mixed[0]);
 
   }, []);
 
   const handleStart = () => {
     setViewState('warping');
-    setTimeout(() => setFlash(true), 1200);
     setTimeout(() => {
       setViewState('card');
-      setTimeout(() => setFlash(false), 800); 
-    }, 1800);
+    }, 1200);
   };
 
   const handleNextEsma = () => {
     setContentFading(true);
     setTimeout(() => {
-      // Bir sonraki karta geç
       let nextIndex = deckIndex + 1;
-
-      // Eğer deste bittiyse, tekrar karıştır ve başa dön
       if (nextIndex >= shuffledDeck.length) {
         const reshuffled = shuffleArray([...esmaData]);
         setShuffledDeck(reshuffled);
         nextIndex = 0;
       }
-      
       setDeckIndex(nextIndex);
       setCurrentEsma(shuffledDeck[nextIndex]);
       setContentFading(false);
     }, 500);
   };
 
-  if (!currentEsma) return null; // Yüklenene kadar bekle
+  if (!currentEsma) return null;
 
   return (
     <>
@@ -400,7 +368,7 @@ function App() {
       <div className={`heavenly-background ${viewState === 'warping' ? 'warping' : ''}`}>
         <div className="nebula"></div>
         
-        {/* ALTIN TOZLARI */}
+        {/* YILDIZLAR (Artık yazının arkasındaki vinyetin altında kalacaklar) */}
         <div className="star-field">
           {stars.map((star) => (
             <div
@@ -410,26 +378,17 @@ function App() {
             ></div>
           ))}
         </div>
-
-        {/* IŞIK HUZMELERİ KATMANI */}
-        <div className="shooting-star-layer">
-            {shootingStars.map(s => (
-                <div key={s.id} className="shooting-star" style={s.style}></div>
-            ))}
-        </div>
       </div>
 
-      {/* --- FLAŞ GEÇİŞİ --- */}
-      <div className={`light-flash ${flash ? 'flash-active' : ''}`}></div>
-
-      {/* --- GİRİŞ EKRANI --- */}
+      {/* --- GİRİŞ EKRANI (Vinyet Efektli) --- */}
       {viewState !== 'card' && (
-        <div className="intro-container" style={{ opacity: viewState === 'warping' ? 0 : 1, transition: 'opacity 1s' }}>
+        <div className="intro-container" style={{ opacity: viewState === 'warping' ? 0 : 1 }}>
           <div className="text-center px-4 relative z-10 extreme-zoom-in">
+            {/* Başlık Parlaması daha netleştirildi */}
             <h1 className="text-7xl md:text-9xl mb-6 font-bold title-glow title-font tracking-tighter">
               Hüsn-ü Hal
             </h1>
-            <p className="text-xl md:text-3xl subtitle-light tracking-[0.5em] font-light uppercase mb-12 title-font">
+            <p className="text-xl md:text-3xl subtitle-light tracking-[0.5em] uppercase mb-12 title-font">
               Esma-ül Hüsna
             </p>
             <button onClick={handleStart} className="start-btn title-font tracking-widest uppercase">
@@ -443,10 +402,8 @@ function App() {
       {viewState === 'card' && (
         <div className="content-container">
           <div className="crystal-card card-explosion">
-            
             <div className={`fade-wrapper ${contentFading ? 'fade-out' : 'fade-in'}`}>
               
-              {/* Arapça İsim */}
               <div className="mb-6">
                 <h2 className="text-8xl md:text-9xl arabic-font gold-mist-text mb-4 drop-shadow-xl">
                   {currentEsma.arabic}
@@ -456,10 +413,8 @@ function App() {
                 </h3>
               </div>
 
-              {/* Ayırıcı Çizgi */}
               <div className="h-px w-32 bg-gradient-to-r from-transparent via-amber-400 to-transparent mx-auto mb-8 opacity-60"></div>
 
-              {/* Anlam ve Soru */}
               <div className="mb-10">
                 <p className="text-2xl meaning-mist font-light body-font leading-relaxed mb-8">
                   {currentEsma.meaning}
@@ -471,11 +426,7 @@ function App() {
                 </div>
               </div>
 
-              {/* Devam Butonu */}
-              <button 
-                onClick={handleNextEsma}
-                className="action-btn"
-              >
+              <button onClick={handleNextEsma} className="action-btn">
                 Tefekküre Devam Et
               </button>
 
