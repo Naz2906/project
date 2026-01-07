@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 // ==========================================
-// 1. CSS STİLLERİ (GÜNCELLENMİŞ GİRİŞ EKRANI)
+// 1. CSS STİLLERİ (ARTIRILMIŞ IŞIK VE EFEKTLER)
 // ==========================================
 const styles = `
   /* FONT AİLESİ */
@@ -17,111 +17,141 @@ const styles = `
   /* --- ARKA PLAN (DERİN GÖKYÜZÜ) --- */
   .heavenly-background {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    /* Derin maviden, turkuaza ve altın sarısı ufuk çizgisine geçiş */
-    background: linear-gradient(160deg, #0c4a6e 0%, #0284c7 40%, #38bdf8 70%, #fef3c7 100%);
+    /* Daha derin ve mistik bir geçiş */
+    background: radial-gradient(circle at center bottom, #1e293b 0%, #0f172a 40%, #020617 100%);
     z-index: 0;
     overflow: hidden;
     perspective: 1000px;
   }
 
+  /* --- YENİ: İLAHİ IŞIK HUZMELERİ (Dönen Işıklar) --- */
+  .light-beams {
+    position: absolute; top: 50%; left: 50%;
+    width: 200vw; height: 200vw;
+    transform: translate(-50%, -50%);
+    background: repeating-conic-gradient(
+      from 0deg,
+      rgba(255, 255, 255, 0.03) 0deg,
+      rgba(255, 255, 255, 0) 15deg,
+      rgba(255, 255, 255, 0.03) 30deg
+    );
+    animation: rotate-beams 60s linear infinite;
+    z-index: 1;
+    pointer-events: none;
+    mask-image: radial-gradient(circle, black 0%, transparent 70%);
+  }
+  @keyframes rotate-beams { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+  /* --- YENİ: ORTAM PARLAMASI (Ambient Glow) --- */
+  .ambient-glow {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, transparent 70%);
+    filter: blur(80px);
+    animation: pulse-glow 8s infinite ease-in-out;
+    z-index: 1;
+  }
+  @keyframes pulse-glow { 0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.2); } }
+
   /* Işık Bulutları (Nebula) */
   .nebula {
     position: absolute; width: 100%; height: 100%;
     background: 
-      radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.3) 0%, transparent 60%), /* Biraz daha şeffaf */
-      radial-gradient(circle at 10% 80%, rgba(253, 224, 71, 0.2) 0%, transparent 50%);
-    filter: blur(70px); /* Daha fazla bulanıklık */
-    animation: light-move 25s infinite alternate ease-in-out; /* Daha yavaş hareket */
+      radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
+      radial-gradient(circle at 20% 80%, rgba(251, 191, 36, 0.08) 0%, transparent 50%);
+    filter: blur(60px);
+    z-index: 2;
   }
-  @keyframes light-move { from { transform: scale(1); opacity: 0.6; } to { transform: scale(1.1); opacity: 0.8; } }
 
   /* --- PARÇACIK SİSTEMİ --- */
-  .star-field { position: absolute; width: 100%; height: 100%; transform-style: preserve-3d; z-index: 1; }
+  .star-field { position: absolute; width: 100%; height: 100%; transform-style: preserve-3d; z-index: 3; }
 
   .star-small {
     position: absolute; background: #fff;
-    border-radius: 50%; width: 2px; height: 2px; /* Biraz daha küçük */
-    box-shadow: 0 0 4px rgba(255, 255, 255, 0.7);
-    animation: dust-float infinite alternate ease-in-out;
+    border-radius: 50%; width: 2px; height: 2px;
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+    animation: twinkle 4s infinite ease-in-out;
   }
-
+  
+  /* Daha parlak büyük yıldızlar */
   .star-sparkle {
-    position: absolute; background: #fbbf24;
-    width: 4px; height: 4px; border-radius: 50%;
-    animation: gold-pulse infinite alternate ease-in-out;
-    box-shadow: 0 0 12px rgba(251, 191, 36, 0.7);
+    position: absolute; background: #fffbeb;
+    width: 3px; height: 3px; border-radius: 50%;
+    animation: float-sparkle 6s infinite ease-in-out;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
   }
-  .star-sparkle::before, .star-sparkle::after {
+  .star-sparkle::after {
     content: ''; position: absolute; top: 50%; left: 50%;
-    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8), transparent);
-    width: 20px; height: 1px; transform: translate(-50%, -50%);
+    width: 20px; height: 1px; background: rgba(255, 255, 255, 0.6);
+    transform: translate(-50%, -50%) rotate(45deg);
   }
-  .star-sparkle::after { transform: translate(-50%, -50%) rotate(90deg); }
+  .star-sparkle::before {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    width: 20px; height: 1px; background: rgba(255, 255, 255, 0.6);
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
 
-  @keyframes dust-float {
-    0% { opacity: 0.2; transform: translateY(0) scale(0.8); }
-    100% { opacity: 0.8; transform: translateY(-30px) scale(1.2); }
-  }
-  @keyframes gold-pulse {
-    0% { opacity: 0.4; transform: scale(0.8); }
-    100% { opacity: 1; transform: scale(1.3); }
-  }
+  @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+  @keyframes float-sparkle { 0%, 100% { transform: translateY(0) scale(1); opacity: 0.7; } 50% { transform: translateY(-20px) scale(1.3); opacity: 1; } }
 
   /* --- GEÇİŞ EFEKTLERİ --- */
   .warping .star-small, .warping .star-sparkle {
     transition: transform 1.5s ease-in;
-    transform: scale(0) translateZ(-1000px) !important; 
-    opacity: 0.5; 
+    transform: scale(0) translateZ(-1000px) !important; opacity: 0; 
   }
 
-  /* --- GİRİŞ EKRANI DÜZENLEMESİ (Vinyet Efekti) --- */
+  /* --- GİRİŞ EKRANI --- */
   .intro-container {
     position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;
     transition: opacity 1.2s ease-in-out;
   }
-
-  /* YENİ: Yazının arkasına koyu bir odak (vinyet) ekleyerek yıldızları bastırıyoruz */
-  .intro-container::before {
-    content: '';
-    position: absolute;
-    inset: -20%; /* Ekrandan biraz daha taşsın */
-    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.7) 0%, rgba(15, 23, 42, 0.3) 40%, transparent 70%);
-    z-index: -1; /* Yazının arkasında */
-    pointer-events: none;
-  }
   
+  /* Giriş yazısı arkasına vinyet */
+  .intro-container::before {
+    content: ''; position: absolute; inset: -50%;
+    background: radial-gradient(circle, rgba(15, 23, 42, 0.8) 0%, transparent 60%);
+    z-index: -1;
+  }
+
   /* Yazı Animasyonu */
   .extreme-zoom-in {
-    animation: extreme-zoom 2s cubic-bezier(0.19, 1, 0.22, 1) forwards; 
+    animation: extreme-zoom 2.5s cubic-bezier(0.19, 1, 0.22, 1) forwards; 
     opacity: 0; transform-origin: center center;
+    text-align: center;
   }
   @keyframes extreme-zoom {
-    0% { opacity: 0; transform: scale(0.8) translateZ(-1000px); letter-spacing: -20px; filter: blur(10px); }
+    0% { opacity: 0; transform: scale(0.8) translateZ(-500px); letter-spacing: -10px; filter: blur(15px); }
     100% { opacity: 1; transform: scale(1) translateZ(0); letter-spacing: normal; filter: blur(0); }
   }
   
-  /* Başlık Parlaması (Daha net ve okunaklı) */
+  /* Başlık Parlaması - Daha güçlü */
   .title-glow {
     color: #ffffff; 
-    /* Dış parlama azaltıldı, iç parlama artırıldı */
-    text-shadow: 0 0 10px rgba(255,255,255,0.9), 0 0 25px rgba(14, 165, 233, 0.3);
+    text-shadow: 0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(14, 165, 233, 0.5), 0 0 80px rgba(14, 165, 233, 0.3);
   }
   .subtitle-light {
-    color: #e0f2fe; /* Biraz daha açık mavi */
-    letter-spacing: 0.5em; text-shadow: 0 0 10px rgba(186, 230, 253, 0.4);
-    font-weight: 400; /* Biraz daha kalın */
+    color: #bae6fd; letter-spacing: 0.6em; 
+    text-shadow: 0 0 15px rgba(186, 230, 253, 0.5); font-weight: 600;
   }
 
   .start-btn {
     padding: 1.2rem 4rem; font-size: 1.3rem; 
-    color: #0c4a6e; background: rgba(255, 255, 255, 0.95); 
-    border: none; border-radius: 50px; cursor: pointer; margin-top: 3rem;
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
-    transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700;
+    color: #020617; background: #fff; 
+    border: none; border-radius: 999px; cursor: pointer; margin-top: 3.5rem;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+    transition: all 0.4s ease; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700;
+    position: relative; overflow: hidden;
   }
   .start-btn:hover {
-    transform: scale(1.05); box-shadow: 0 0 40px rgba(255, 255, 255, 0.6); background: #fff;
+    transform: scale(1.05); box-shadow: 0 0 60px rgba(255, 255, 255, 0.8);
   }
+  .start-btn::after {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.8), transparent);
+    transform: rotate(45deg) translate(-100%, -100%);
+    animation: shimmer 3s infinite;
+  }
+  @keyframes shimmer { 100% { transform: rotate(45deg) translate(100%, 100%); } }
 
   /* --- KART GÖRÜNÜMÜ --- */
   .content-container {
@@ -129,57 +159,65 @@ const styles = `
   }
   .card-explosion { animation: card-appear 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
   @keyframes card-appear {
-    from { opacity: 0; transform: scale(0.6) translateY(50px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
+    from { opacity: 0; transform: scale(0.8) translateY(50px); filter: blur(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
   }
 
   .crystal-card {
     width: 90%; max-width: 600px;
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255,255,255, 0.2) inset, 0 0 30px rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255, 0.1) inset, 0 0 40px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
     border-radius: 40px; padding: 3rem 2rem;
     text-align: center; position: relative;
+    overflow: hidden;
+  }
+  /* Kart içi parlama */
+  .crystal-card::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+    pointer-events: none;
   }
   
   .gold-mist-text {
-    background: linear-gradient(to bottom, #fffbeb 0%, #fbbf24 50%, #d97706 100%);
+    background: linear-gradient(to bottom, #fffbeb 10%, #fbbf24 50%, #d97706 90%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
-    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6)) drop-shadow(0 0 20px rgba(251, 191, 36, 0.3));
+    filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.5));
   }
   .transliteration-mist { 
-    color: #e0f2fe; font-weight: 300; text-shadow: 0 0 10px rgba(224, 242, 254, 0.6); 
+    color: #e0f2fe; font-weight: 300; text-shadow: 0 0 15px rgba(224, 242, 254, 0.5); 
   }
   .meaning-mist { 
-    color: #ffffff; font-weight: 500; text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    color: #ffffff; font-weight: 500; text-shadow: 0 2px 10px rgba(0,0,0,0.5);
   }
 
   .question-box {
-    background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 1rem; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1rem; padding: 1.5rem; 
   }
   .question-text { 
-    color: #bae6fd; font-style: italic; text-shadow: 0 0 5px rgba(186, 230, 253, 0.4);
+    color: #bae6fd; font-style: italic; text-shadow: 0 0 8px rgba(186, 230, 253, 0.3);
   }
 
   .action-btn {
-    border: 1px solid #fbbf24; color: #fbbf24; background: rgba(0,0,0,0.2);
-    padding: 1rem 2.5rem; border-radius: 999px; margin-top: 2rem;
-    text-transform: uppercase; letter-spacing: 0.15em; font-size: 0.85rem; font-weight: 600;
-    transition: all 0.3s; box-shadow: 0 0 10px rgba(251, 191, 36, 0.1);
+    border: 1px solid #fbbf24; color: #fbbf24; background: rgba(0,0,0,0.3);
+    padding: 1rem 3rem; border-radius: 999px; margin-top: 2rem;
+    text-transform: uppercase; letter-spacing: 0.15em; font-size: 0.9rem; font-weight: 700;
+    transition: all 0.3s; box-shadow: 0 0 15px rgba(251, 191, 36, 0.1);
+    cursor: pointer; position: relative; z-index: 10;
   }
   .action-btn:hover {
-    background: #fbbf24; color: #0c4a6e; transform: scale(1.05); box-shadow: 0 0 25px rgba(251, 191, 36, 0.6);
+    background: #fbbf24; color: #0f172a; transform: scale(1.05); box-shadow: 0 0 30px rgba(251, 191, 36, 0.6);
   }
   
   .fade-wrapper { transition: all 0.5s ease; }
-  .fade-out { opacity: 0; transform: scale(1.1); filter: blur(10px); }
+  .fade-out { opacity: 0; transform: scale(0.95); filter: blur(10px); }
   .fade-in { opacity: 1; transform: scale(1); filter: blur(0); }
 `;
 
 // ==========================================
-// 2. VERİ SETİ (99 İSİM)
+// 2. VERİ SETİ (Kısaltılmamış Tam Liste)
 // ==========================================
 const esmaData = [
   { id: 1, arabic: 'اللَّهُ', transliteration: 'Allah', meaning: 'Kâinatın tek yaratıcısı.', question: 'Kendinden büyük bir güce teslim olmak sana ne hissettiriyor?' },
@@ -310,11 +348,11 @@ function App() {
   const [currentEsma, setCurrentEsma] = useState(null); 
 
   useEffect(() => {
-    // 1. PARTİKÜLLER (Yıldız sayısını biraz azalttık ve boyutlarını küçülttük CSS'te)
-    const starCount = 150; 
+    // 1. PARTİKÜLLER
+    const starCount = 180; // Yıldız sayısını biraz artırdık
     const newStars = [];
     for (let i = 0; i < starCount; i++) {
-      const isSparkle = Math.random() > 0.92; 
+      const isSparkle = Math.random() > 0.94; 
       newStars.push({
         id: i,
         type: isSparkle ? 'sparkle' : 'small',
@@ -328,10 +366,11 @@ function App() {
     }
     setStars(newStars);
     
-    // 2. DESTEYİ KARIŞTIR
+    // 2. DESTEYİ KARIŞTIR (Her yüklemede tamamen rastgele sıra)
     const mixed = shuffleArray([...esmaData]);
     setShuffledDeck(mixed);
     setDeckIndex(0);
+    // İlk kartı rastgele listenin en başından al
     setCurrentEsma(mixed[0]);
 
   }, []);
@@ -347,11 +386,14 @@ function App() {
     setContentFading(true);
     setTimeout(() => {
       let nextIndex = deckIndex + 1;
+      
+      // Liste biterse yeniden karıştır
       if (nextIndex >= shuffledDeck.length) {
         const reshuffled = shuffleArray([...esmaData]);
         setShuffledDeck(reshuffled);
         nextIndex = 0;
       }
+      
       setDeckIndex(nextIndex);
       setCurrentEsma(shuffledDeck[nextIndex]);
       setContentFading(false);
@@ -364,11 +406,13 @@ function App() {
     <>
       <style>{styles}</style>
 
-      {/* --- AYDINLIK ARKA PLAN --- */}
+      {/* --- ARKA PLAN VE IŞIK EFEKTLERİ --- */}
       <div className={`heavenly-background ${viewState === 'warping' ? 'warping' : ''}`}>
+        <div className="light-beams"></div> {/* Dönen ışık huzmeleri */}
+        <div className="ambient-glow"></div> {/* Ortam parlaması */}
         <div className="nebula"></div>
         
-        {/* YILDIZLAR (Artık yazının arkasındaki vinyetin altında kalacaklar) */}
+        {/* YILDIZLAR */}
         <div className="star-field">
           {stars.map((star) => (
             <div
@@ -380,18 +424,17 @@ function App() {
         </div>
       </div>
 
-      {/* --- GİRİŞ EKRANI (Vinyet Efektli) --- */}
+      {/* --- GİRİŞ EKRANI --- */}
       {viewState !== 'card' && (
         <div className="intro-container" style={{ opacity: viewState === 'warping' ? 0 : 1 }}>
           <div className="text-center px-4 relative z-10 extreme-zoom-in">
-            {/* Başlık Parlaması daha netleştirildi */}
             <h1 className="text-7xl md:text-9xl mb-6 font-bold title-glow title-font tracking-tighter">
               Hüsn-ü Hal
             </h1>
             <p className="text-xl md:text-3xl subtitle-light tracking-[0.5em] uppercase mb-12 title-font">
               Esma-ül Hüsna
             </p>
-            <button onClick={handleStart} className="start-btn title-font tracking-widest uppercase">
+            <button onClick={handleStart} className="start-btn title-font">
               Bismillah
             </button>
           </div>
@@ -426,7 +469,7 @@ function App() {
                 </div>
               </div>
 
-              <button onClick={handleNextEsma} className="action-btn">
+              <button onClick={handleNextEsma} className="action-btn body-font">
                 Tefekküre Devam Et
               </button>
 
