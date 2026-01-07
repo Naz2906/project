@@ -24,39 +24,33 @@ const styles = `
     perspective: 1000px;
   }
 
-  /* Işık Bulutları (Daha belirgin) */
+  /* Işık Bulutları */
   .nebula {
     position: absolute; width: 100%; height: 100%;
     background: 
-      radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.4) 0%, transparent 50%), /* Üstten inen nur */
-      radial-gradient(circle at 10% 80%, rgba(253, 224, 71, 0.3) 0%, transparent 40%); /* Alttan vuran altın ışık */
+      radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
+      radial-gradient(circle at 10% 80%, rgba(253, 224, 71, 0.3) 0%, transparent 40%);
     filter: blur(60px);
     animation: light-move 20s infinite alternate ease-in-out;
   }
   @keyframes light-move { from { transform: scale(1); opacity: 0.7; } to { transform: scale(1.1); opacity: 0.9; } }
 
-  /* --- PARÇACIK SİSTEMİ (Altın Tozları) --- */
+  /* --- PARÇACIK SİSTEMİ --- */
   .star-field { position: absolute; width: 100%; height: 100%; transform-style: preserve-3d; }
 
-  /* Küçük Tozlar */
   .star-small {
-    position: absolute; 
-    background: #fff; /* Gökyüzünde beyaz daha iyi görünür */
+    position: absolute; background: #fff;
     border-radius: 50%; width: 3px; height: 3px;
     box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
     animation: dust-float infinite alternate ease-in-out;
   }
 
-  /* Büyük Parıltılar */
   .star-sparkle {
-    position: absolute; 
-    background: #fbbf24; /* Altın */
+    position: absolute; background: #fbbf24;
     width: 5px; height: 5px; border-radius: 50%;
     animation: gold-pulse infinite alternate ease-in-out;
     box-shadow: 0 0 15px rgba(251, 191, 36, 0.8);
   }
-
-  /* Haç Şekli Işıltı */
   .star-sparkle::before, .star-sparkle::after {
     content: ''; position: absolute; top: 50%; left: 50%;
     background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.9), transparent);
@@ -64,12 +58,10 @@ const styles = `
   }
   .star-sparkle::after { transform: translate(-50%, -50%) rotate(90deg); }
 
-  /* --- ANİMASYONLAR --- */
   @keyframes dust-float {
     0% { opacity: 0.3; transform: translateY(0) scale(0.8); }
     100% { opacity: 0.9; transform: translateY(-30px) scale(1.2); }
   }
-
   @keyframes gold-pulse {
     0% { opacity: 0.5; transform: scale(0.8); }
     100% { opacity: 1; transform: scale(1.3); }
@@ -79,11 +71,9 @@ const styles = `
   .shooting-star-layer { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
   .shooting-star {
     position: absolute; width: 400px; height: 1px;
-    /* Beyazdan şeffafa */
     background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), transparent);
     filter: drop-shadow(0 0 8px rgba(255,255,255,0.8)); 
-    opacity: 0;
-    transform: rotate(-45deg); 
+    opacity: 0; transform: rotate(-45deg); 
     animation: light-beam 6s infinite ease-out;
   }
   @keyframes light-beam {
@@ -93,7 +83,7 @@ const styles = `
     100% { opacity: 0; }
   }
 
-  /* --- GEÇİŞ EFEKTLERİ --- */
+  /* --- GEÇİŞ VE EFEKTLER --- */
   .warping .star-small, .warping .star-sparkle {
     transition: transform 1.5s ease-in, opacity 1.5s ease-in;
     transform: scale(0) translateZ(-2000px) !important;
@@ -101,14 +91,12 @@ const styles = `
   }
 
   .light-flash {
-    position: absolute; inset: 0; 
-    background: #fff;
+    position: absolute; inset: 0; background: #fff;
     opacity: 0; pointer-events: none; z-index: 100;
     transition: opacity 0.8s ease-out;
   }
   .flash-active { opacity: 1; }
 
-  /* --- GİRİŞ EKRANI (INTRO) --- */
   .intro-container {
     position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;
   }
@@ -122,39 +110,28 @@ const styles = `
     100% { opacity: 1; transform: scale(1) translateZ(0); letter-spacing: normal; filter: blur(0); }
   }
   
-  /* Başlık */
   .title-glow {
-    color: #ffffff;
-    text-shadow: 0 0 20px rgba(255,255,255,0.6), 0 0 40px rgba(14, 165, 233, 0.4);
+    color: #ffffff; text-shadow: 0 0 20px rgba(255,255,255,0.6), 0 0 40px rgba(14, 165, 233, 0.4);
   }
-
   .subtitle-light {
-    color: #bae6fd; /* Açık mavi */
-    letter-spacing: 0.5em;
-    text-shadow: 0 0 10px rgba(186, 230, 253, 0.5);
+    color: #bae6fd; letter-spacing: 0.5em; text-shadow: 0 0 10px rgba(186, 230, 253, 0.5);
   }
 
   .start-btn {
     padding: 1.5rem 5rem; font-size: 1.5rem; 
-    color: #0c4a6e; /* Koyu Mavi */
-    background: rgba(255, 255, 255, 0.9); 
-    border: none;
-    border-radius: 50px; cursor: pointer; margin-top: 3rem;
+    color: #0c4a6e; background: rgba(255, 255, 255, 0.9); 
+    border: none; border-radius: 50px; cursor: pointer; margin-top: 3rem;
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-    transition: all 0.3s;
-    text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700;
+    transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700;
   }
   .start-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
-    background: #fff;
+    transform: scale(1.05); box-shadow: 0 0 40px rgba(255, 255, 255, 0.8); background: #fff;
   }
 
   /* --- KART GÖRÜNÜMÜ --- */
   .content-container {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 20; perspective: 1200px;
   }
-  
   .card-explosion { animation: card-appear 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
   @keyframes card-appear {
     from { opacity: 0; transform: scale(0.3) rotateX(10deg) translateZ(-200px); }
@@ -165,63 +142,40 @@ const styles = `
     width: 90%; max-width: 600px;
     background: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 
-      0 20px 50px rgba(0, 0, 0, 0.2),
-      0 0 0 1px rgba(255,255,255, 0.2) inset,
-      0 0 30px rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255,255,255, 0.2) inset, 0 0 30px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     border-radius: 40px; padding: 3rem 2rem;
     text-align: center; position: relative;
   }
   
-  /* Arapça Yazı Stili */
   .gold-mist-text {
     background: linear-gradient(to bottom, #fffbeb 0%, #fbbf24 50%, #d97706 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
     filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6)) drop-shadow(0 0 20px rgba(251, 191, 36, 0.3));
   }
-  
   .transliteration-mist { 
-    color: #e0f2fe; 
-    font-weight: 300; 
-    text-shadow: 0 0 10px rgba(224, 242, 254, 0.6); 
+    color: #e0f2fe; font-weight: 300; text-shadow: 0 0 10px rgba(224, 242, 254, 0.6); 
   }
-
   .meaning-mist { 
-    color: #ffffff; 
-    font-weight: 500; 
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    color: #ffffff; font-weight: 500; text-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
 
   .question-box {
-    background: rgba(255, 255, 255, 0.1); 
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 1rem; padding: 1.5rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 1rem; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
   }
-  
   .question-text { 
-    color: #bae6fd; 
-    font-style: italic; 
-    text-shadow: 0 0 5px rgba(186, 230, 253, 0.4);
+    color: #bae6fd; font-style: italic; text-shadow: 0 0 5px rgba(186, 230, 253, 0.4);
   }
 
   .action-btn {
-    border: 1px solid #fbbf24;
-    color: #fbbf24;
-    background: rgba(0,0,0,0.2);
-    padding: 1rem 2.5rem; border-radius: 999px;
-    margin-top: 2rem;
+    border: 1px solid #fbbf24; color: #fbbf24; background: rgba(0,0,0,0.2);
+    padding: 1rem 2.5rem; border-radius: 999px; margin-top: 2rem;
     text-transform: uppercase; letter-spacing: 0.15em; font-size: 0.85rem; font-weight: 600;
-    transition: all 0.3s;
-    box-shadow: 0 0 10px rgba(251, 191, 36, 0.1);
+    transition: all 0.3s; box-shadow: 0 0 10px rgba(251, 191, 36, 0.1);
   }
   .action-btn:hover {
-    background: #fbbf24;
-    color: #0c4a6e;
-    transform: scale(1.05);
-    box-shadow: 0 0 25px rgba(251, 191, 36, 0.6);
+    background: #fbbf24; color: #0c4a6e; transform: scale(1.05); box-shadow: 0 0 25px rgba(251, 191, 36, 0.6);
   }
   
   .fade-wrapper { transition: all 0.5s ease; }
@@ -335,23 +289,42 @@ const esmaData = [
 ];
 
 // ==========================================
-// 3. UYGULAMA MANTIĞI (APP COMPONENT)
+// 3. YARDIMCI FONKSİYON: KARIŞTIRMA (SHUFFLE)
+// ==========================================
+// Fisher-Yates Algoritması ile diziyi karıştırır
+const shuffleArray = (array) => {
+  let currentIndex = array.length,  randomIndex;
+
+  // Dizi bitene kadar rastgele bir eleman seç ve yer değiştir
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+  }
+  return array;
+}
+
+// ==========================================
+// 4. UYGULAMA MANTIĞI (APP COMPONENT)
 // ==========================================
 function App() {
-  const [viewState, setViewState] = useState('intro'); // 'intro' | 'warping' | 'card'
+  const [viewState, setViewState] = useState('intro');
   const [flash, setFlash] = useState(false); 
-  const [currentEsma, setCurrentEsma] = useState(esmaData[0]);
   const [contentFading, setContentFading] = useState(false);
   const [stars, setStars] = useState([]);
   const [shootingStars, setShootingStars] = useState([]);
 
+  // Karıştırılmış Deste State'leri
+  const [shuffledDeck, setShuffledDeck] = useState([]); // Karışık liste
+  const [deckIndex, setDeckIndex] = useState(0); // Şu an kaçıncı sıradayız
+  const [currentEsma, setCurrentEsma] = useState(null); // Ekranda gösterilen esma
+
   useEffect(() => {
-    // 1. ALTIN TOZLARI (Particles)
+    // 1. PARTİKÜLLERİ OLUŞTUR
     const starCount = 200; 
     const newStars = [];
-    
     for (let i = 0; i < starCount; i++) {
-      const isSparkle = Math.random() > 0.90; // %10 parlak ışıltı
+      const isSparkle = Math.random() > 0.90; 
       newStars.push({
         id: i,
         type: isSparkle ? 'sparkle' : 'small',
@@ -365,7 +338,7 @@ function App() {
     }
     setStars(newStars);
 
-    // 2. SÜZÜLEN IŞIK HUZMELERİ
+    // 2. IŞIK HUZMELERİ
     const sStars = [];
     for(let i = 0; i < 5; i++) {
         sStars.push({
@@ -380,14 +353,18 @@ function App() {
     }
     setShootingStars(sStars);
     
-    setCurrentEsma(esmaData[Math.floor(Math.random() * esmaData.length)]);
+    // 3. DESTEYİ KARIŞTIR VE BAŞLAT
+    // Tüm listeyi kopyala ve karıştır
+    const mixed = shuffleArray([...esmaData]);
+    setShuffledDeck(mixed);
+    setDeckIndex(0);
+    setCurrentEsma(mixed[0]); // İlk kartı ayarla
+
   }, []);
 
   const handleStart = () => {
     setViewState('warping');
-    // 1.2 sn sonra flaş patlar
     setTimeout(() => setFlash(true), 1200);
-    // 1.8 sn sonra kart gelir
     setTimeout(() => {
       setViewState('card');
       setTimeout(() => setFlash(false), 800); 
@@ -397,11 +374,23 @@ function App() {
   const handleNextEsma = () => {
     setContentFading(true);
     setTimeout(() => {
-      const randomIdx = Math.floor(Math.random() * esmaData.length);
-      setCurrentEsma(esmaData[randomIdx]);
+      // Bir sonraki karta geç
+      let nextIndex = deckIndex + 1;
+
+      // Eğer deste bittiyse, tekrar karıştır ve başa dön
+      if (nextIndex >= shuffledDeck.length) {
+        const reshuffled = shuffleArray([...esmaData]);
+        setShuffledDeck(reshuffled);
+        nextIndex = 0;
+      }
+      
+      setDeckIndex(nextIndex);
+      setCurrentEsma(shuffledDeck[nextIndex]);
       setContentFading(false);
     }, 500);
   };
+
+  if (!currentEsma) return null; // Yüklenene kadar bekle
 
   return (
     <>
